@@ -1,0 +1,832 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalaryMate</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rubik', sans-serif;
+        }
+
+        body {
+            background: var(--bg-color, #f8f1f9);
+            color: var(--text-color, #333333);
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        :root {
+            /* Light Theme (Default: Pink) */
+            --bg-color: #f8f1f9;
+            --text-color: #333333;
+            --primary-color: #ff69b4;
+            --secondary-color: #ff69b4;
+            --accent-color: #ffffff;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark Theme with Palette-Specific Backgrounds */
+        [data-theme="dark"] {
+            --text-color: #333333; /* שחור עדין */
+            --card-bg: rgba(255, 255, 255, 0.2);
+            --accent-color: #ffffff;
+            --shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+        [data-theme="dark"][data-palette="pink"] { --bg-color: #c71585; --secondary-color: #c71585; }
+        [data-theme="dark"][data-palette="red"] { --bg-color: #8b0000; --secondary-color: #8b0000; }
+        [data-theme="dark"][data-palette="yellow"] { --bg-color: #b8860b; --secondary-color: #b8860b; }
+        [data-theme="dark"][data-palette="black-white"] { --bg-color: #333333; --secondary-color: #333333; }
+        [data-theme="dark"][data-palette="gray"] { --bg-color: #666666; --secondary-color: #666666; }
+        [data-theme="dark"][data-palette="blue"] { --bg-color: #191970; --secondary-color: #191970; }
+        [data-theme="dark"][data-palette="cyan"] { --bg-color: #008b8b; --secondary-color: #008b8b; }
+        [data-theme="dark"][data-palette="green"] { --bg-color: #006400; --secondary-color: #006400; }
+        [data-theme="dark"][data-palette="orange"] { --bg-color: #ff4500; --secondary-color: #ff4500; }
+
+        /* Color Palettes */
+        [data-palette="pink"] { --primary-color: #ff69b4; --secondary-color: #ff69b4; }
+        [data-palette="red"] { --primary-color: #dc143c; --secondary-color: #dc143c; }
+        [data-palette="yellow"] { --primary-color: #ffd700; --secondary-color: #ffd700; }
+        [data-palette="black-white"] { --primary-color: #000000; --secondary-color: #000000; --accent-color: #ffffff; }
+        [data-palette="gray"] { --primary-color: #808080; --secondary-color: #808080; --accent-color: #ffffff; }
+        [data-palette="blue"] { --primary-color: #4682b4; --secondary-color: #4682b4; }
+        [data-palette="cyan"] { --primary-color: #00ced1; --secondary-color: #00ced1; }
+        [data-palette="green"] { --primary-color: #32cd32; --secondary-color: #32cd32; }
+        [data-palette="orange"] { --primary-color: #ff4500; --secondary-color: #ff4500; }
+
+        .container {
+            max-width: 100%;
+            padding: 30px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: var(--secondary-color);
+            color: var(--accent-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            height: 50px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 60%;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(0, 0, 0, 0.8); /* רקע כהה עם שקיפות */
+            color: #333333; /* טקסט שחור עדין */
+        }
+
+        .icon {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--accent-color);
+            transition: color 0.3s ease;
+        }
+
+        .icon:hover {
+            color: var(--primary-color);
+        }
+
+        .theme-toggle .fas.fa-moon {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        .theme-toggle .fas.fa-moon:hover {
+            background: var(--primary-color);
+            color: var(--accent-color);
+        }
+
+        .theme-toggle select {
+            padding: 5px 10px;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            background: var(--accent-color);
+            color: var(--text-color);
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            font-size: 16px;
+            max-width: 120px; /* קיצור השדה */
+        }
+
+        .theme-toggle select:hover {
+            background: var(--primary-color);
+            color: var(--accent-color);
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: var(--card-bg);
+            transition: right 0.3s ease;
+            padding: 30px;
+            z-index: 1100;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            margin: 15px 0;
+            font-size: 20px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background: var(--primary-color);
+            color: var(--accent-color);
+        }
+
+        .sidebar .close-sidebar {
+            text-align: center;
+            padding: 10px;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .sidebar .close-sidebar:hover {
+            background: var(--primary-color);
+            color: var(--accent-color);
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            justify-content: center;
+            position: relative;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        h1, h2, h3, h4 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h1 { font-size: 36px; font-weight: 700; }
+        h3 { font-size: 24px; font-weight: 500; }
+        h4 { font-size: 20px; font-weight: 400; }
+
+        input, select {
+            padding: 15px;
+            margin: 10px 0;
+            width: 100%;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            background: var(--accent-color);
+            color: var(--text-color);
+            font-size: 14px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        button {
+            padding: 15px 30px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+        }
+
+        button:hover {
+            background: var(--secondary-color);
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .calendar div {
+            padding: 15px;
+            background: var(--accent-color);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .calendar div:hover {
+            background: var(--primary-color);
+            color: var(--accent-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 10px 20px;
+            }
+
+            .sidebar {
+                width: 250px;
+                padding: 20px;
+            }
+
+            h1 { font-size: 28px; }
+            h3 { font-size: 20px; }
+            h4 { font-size: 18px; }
+
+            input, button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <i class="fas fa-bars icon menu-icon" onclick="toggleSidebar()"></i>
+        <h1>SalaryMate</h1>
+        <i class="fas fa-home icon home-icon" onclick="navigate('home')"></i>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <a href="#" onclick="navigate('home')"><i class="fas fa-home"></i> בית</a>
+        <a href="#" onclick="navigate('monthly')"><i class="fas fa-calculator"></i> חישוב חודשי כללי</a>
+        <a href="#" onclick="navigate('schedule')"><i class="fas fa-calendar-alt"></i> לוח חודשי</a>
+        <a href="#" onclick="navigate('yearly')"><i class="fas fa-chart-bar"></i> חישוב שנתי</a>
+        <div class="close-sidebar" onclick="toggleSidebar()">סגור תפריט</div>
+    </div>
+
+    <div class="container" id="app">
+        <!-- Pages will be dynamically loaded here -->
+    </div>
+
+    <div class="modal" id="dayModal">
+        <div class="modal-content">
+            <h3>הזנת שעות עבודה</h3>
+            <p style="font-size: 14px; color: var(--text-color);">שעת התחלת משמרת: הזן את שעת התחלת העבודה</p>
+            <input type="time" id="startShiftTime" placeholder="שעת התחלה">
+            <p style="font-size: 14px; color: var(--text-color);">שעת סיום משמרת: הזן את שעת סיום העבודה</p>
+            <input type="time" id="endShiftTime" placeholder="שעת סיום">
+            <p style="font-size: 14px; color: var(--text-color);">שעות משמרת: הזן את מספר השעות בעבודה</p>
+            <input type="number" id="shiftHours" placeholder="שעות משמרת" step="0.5">
+            <p style="font-size: 14px; color: var(--text-color);">שעות עם בונוס: הזן שעות עם תוספת תשלום</p>
+            <input type="number" id="bonusHours" placeholder="שעות עם בונוס" step="0.5">
+            <p style="font-size: 14px; color: var(--text-color);">אחוז בונוס: הזן את אחוז התוספת לשעות הבונוס</p>
+            <input type="number" id="bonusPercent" placeholder="אחוז בונוס (%)">
+            <p id="dailyGross" style="font-size: 16px; color: var(--primary-color);"></p>
+            <button onclick="saveDayData()">שמור</button>
+            <button onclick="closeModal()">סגור</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        const { jsPDF } = window.jspdf;
+        let userName = localStorage.getItem('userName') || '';
+        let currentPage = 'name';
+        let hourlyRate = 0;
+        let totalHours = 0;
+        let selectedDay = null;
+        let selectedMonth = new Date().getMonth();
+        let selectedYear = new Date().getFullYear();
+        const dataStore = JSON.parse(localStorage.getItem('dataStore')) || {};
+
+        console.log("Initial dataStore:", dataStore); // לוג לטעינת נתונים
+
+        // הגדרת מדרגות מס הכנסה (2025, חודשי)
+        const taxBrackets = [
+            { threshold: 7010, rate: 0.10 },
+            { threshold: 10050, rate: 0.14 },
+            { threshold: 16150, rate: 0.20 },
+            { threshold: 22450, rate: 0.31 },
+            { threshold: 48260, rate: 0.35 },
+            { threshold: 60125, rate: 0.47 },
+            { threshold: Infinity, rate: 0.50 }
+        ];
+
+        // הגדרת ביטוח לאומי (2025, חודשי)
+        const niRates = [
+            { threshold: 7522, rate: 0.0125 }, // 1.25% על ההכנסה הראשונה
+            { threshold: 50695, rate: 0.07 }    // 7% על ההכנסה שבין 7,522 ל-50,695
+        ];
+
+        // הגדרת פנסיה (6% מהברוטו)
+        const pensionRate = 0.06;
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function navigate(page) {
+            currentPage = page;
+            renderPage();
+        }
+
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        function setPalette(palette) {
+            document.body.setAttribute('data-palette', palette);
+            localStorage.setItem('palette', palette);
+        }
+
+        function toggleColorDropdown() {
+            const dropdown = document.querySelector('.color-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
+            // סגירה בעת לחיצה מחוץ לתפריט
+            document.addEventListener('click', function closeDropdown(event) {
+                if (!dropdown.contains(event.target) && !event.target.closest('.theme-toggle')) {
+                    dropdown.classList.remove('active');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }
+
+        function deleteMonthlyData() {
+            if (dataStore[selectedYear]?.[selectedMonth]) {
+                delete dataStore[selectedYear][selectedMonth];
+                localStorage.setItem('dataStore', JSON.stringify(dataStore));
+                updateCalendar();
+                calculateMonthlySchedule();
+                alert('נתוני החודש נמחקו בהצלחה!');
+            } else {
+                alert('אין נתונים למחיקה עבור חודש זה.');
+            }
+        }
+
+        function deleteYearlyData() {
+            if (dataStore[selectedYear]) {
+                delete dataStore[selectedYear];
+                localStorage.setItem('dataStore', JSON.stringify(dataStore));
+                renderYearly();
+                alert('כל נתוני השנה נמחקו בהצלחה!');
+            } else {
+                alert('אין נתונים למחיקה עבור שנה זו.');
+            }
+        }
+
+        function calculateTax(income) {
+            let tax = 0;
+            let remainingIncome = income;
+            for (let bracket of taxBrackets) {
+                if (remainingIncome <= 0) break;
+                const taxableInBracket = Math.min(remainingIncome, bracket.threshold - (taxBrackets.indexOf(bracket) === 0 ? 0 : taxBrackets[taxBrackets.indexOf(bracket) - 1].threshold));
+                if (taxableInBracket > 0) {
+                    tax += taxableInBracket * bracket.rate;
+                    remainingIncome -= taxableInBracket;
+                }
+            }
+            return tax;
+        }
+
+        function calculateNationalInsurance(income) {
+            let ni = 0;
+            let remainingIncome = income;
+            for (let rate of niRates) {
+                if (remainingIncome <= 0) break;
+                const taxableInBracket = Math.min(remainingIncome, rate.threshold - (niRates.indexOf(rate) === 0 ? 0 : niRates[niRates.indexOf(rate) - 1].threshold));
+                if (taxableInBracket > 0) {
+                    ni += taxableInBracket * rate.rate;
+                    remainingIncome -= taxableInBracket;
+                }
+            }
+            return ni;
+        }
+
+        function calculateSalary(hourlyRate, regularHours, bonusHours = 0, bonusPercent = 0) {
+            let gross = (regularHours * hourlyRate) + (bonusHours * hourlyRate * (bonusPercent / 100));
+            let tax = calculateTax(gross);
+            let ni = calculateNationalInsurance(gross);
+            let pension = gross * pensionRate;
+            let net = gross - tax - ni - pension;
+            return { gross, tax, ni, pension, net };
+        }
+
+        function renderPage() {
+            const app = document.getElementById('app');
+            let html = '';
+
+            if (currentPage === 'name') {
+                html = `
+                    <div class="card">
+                        <h2>ברוכים הבאים ל-SalaryMate</h2>
+                        <input type="text" id="nameInput" placeholder="הזן את שמך" value="${userName}">
+                        <button onclick="saveName()">המשך</button>
+                    </div>
+                `;
+            } else if (currentPage === 'home') {
+                html = `
+                    <div class="card">
+                        <h1>SalaryMate</h1>
+                        <h3>חישוב חכם יותר של המשכורת שלך</h3>
+                        <h4>שלום ${userName}</h4>
+                        <p>רוצה לעבור לאחד הדפים הבאים?</p>
+                        <div class="button-group">
+                            <button onclick="navigate('monthly')">חישוב חודשי כללי</button>
+                            <button onclick="navigate('schedule')">לוח חודשי</button>
+                            <button onclick="navigate('yearly')">חישוב שנתי</button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentPage === 'monthly') {
+                html = `
+                    <div class="card">
+                        <h1>SalaryMate</h1>
+                        <h3>חישוב חכם יותר של המשכורת שלך</h3>
+                        <h4>שלום ${userName}</h4>
+                        <div class="theme-toggle">
+                            <i class="fas fa-moon icon" onclick="toggleTheme()"></i>
+                            <select onchange="setPalette(this.value)">
+                                <option value="pink" ${localStorage.getItem('palette') === 'pink' ? 'selected' : ''}>ורוד</option>
+                                <option value="red" ${localStorage.getItem('palette') === 'red' ? 'selected' : ''}>אדום</option>
+                                <option value="yellow" ${localStorage.getItem('palette') === 'yellow' ? 'selected' : ''}>צהוב</option>
+                                <option value="black-white" ${localStorage.getItem('palette') === 'black-white' ? 'selected' : ''}>שחור-לבן</option>
+                                <option value="gray" ${localStorage.getItem('palette') === 'gray' ? 'selected' : ''}>אפור</option>
+                                <option value="blue" ${localStorage.getItem('palette') === 'blue' ? 'selected' : ''}>כחול</option>
+                                <option value="cyan" ${localStorage.getItem('palette') === 'cyan' ? 'selected' : ''}>תכלת</option>
+                                <option value="green" ${localStorage.getItem('palette') === 'green' ? 'selected' : ''}>ירוק</option>
+                                <option value="orange" ${localStorage.getItem('palette') === 'orange' ? 'selected' : ''}>כתום</option>
+                            </select>
+                        </div>
+                        <input type="number" id="hourlyRate" placeholder="שכר שעתי (₪)" step="0.5">
+                        <input type="number" id="totalHours" placeholder="מספר שעות" step="0.5">
+                        <button onclick="calculateMonthly()">חשב</button>
+                        <div id="result"></div>
+                        <div class="button-group">
+                            <button onclick="navigate('home')">חזור</button>
+                            <button onclick="navigate('schedule')">לוח חודשי</button>
+                            <button onclick="navigate('yearly')">חישוב שנתי</button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentPage === 'schedule') {
+                html = `
+                    <div class="card">
+                        <h1>SalaryMate</h1>
+                        <h3>חישוב חכם יותר של המשכורת שלך</h3>
+                        <h4>שלום ${userName}</h4>
+                        <div class="theme-toggle">
+                            <i class="fas fa-moon icon" onclick="toggleTheme()"></i>
+                            <select onchange="setPalette(this.value)">
+                                <option value="pink" ${localStorage.getItem('palette') === 'pink' ? 'selected' : ''}>ורוד</option>
+                                <option value="red" ${localStorage.getItem('palette') === 'red' ? 'selected' : ''}>אדום</option>
+                                <option value="yellow" ${localStorage.getItem('palette') === 'yellow' ? 'selected' : ''}>צהוב</option>
+                                <option value="black-white" ${localStorage.getItem('palette') === 'black-white' ? 'selected' : ''}>שחור-לבן</option>
+                                <option value="gray" ${localStorage.getItem('palette') === 'gray' ? 'selected' : ''}>אפור</option>
+                                <option value="blue" ${localStorage.getItem('palette') === 'blue' ? 'selected' : ''}>כחול</option>
+                                <option value="cyan" ${localStorage.getItem('palette') === 'cyan' ? 'selected' : ''}>תכלת</option>
+                                <option value="green" ${localStorage.getItem('palette') === 'green' ? 'selected' : ''}>ירוק</option>
+                                <option value="orange" ${localStorage.getItem('palette') === 'orange' ? 'selected' : ''}>כתום</option>
+                            </select>
+                        </div>
+                        <input type="number" id="hourlyRateSchedule" placeholder="שכר שעתי (₪)" step="0.5">
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <select id="monthSelect" onchange="updateCalendar()" style="flex: 1; border-radius: 20px;">
+                                ${[...Array(12).keys()].map(i => `<option value="${i}" ${i === selectedMonth ? 'selected' : ''}>${new Date(0, i).toLocaleString('he', { month: 'long' })}</option>`).join('')}
+                            </select>
+                            <input type="number" id="yearSelect" value="${selectedYear}" min="1948" max="2500" onchange="updateCalendar()" style="flex: 1; border-radius: 20px;">
+                        </div>
+                        <div class="calendar" id="calendar"></div>
+                        <div id="monthlyResult"></div>
+                        <div class="button-group">
+                            <button onclick="navigate('home')">חזור</button>
+                            <button onclick="navigate('yearly')">חישוב שנתי</button>
+                            <button onclick="deleteMonthlyData()">מחק נתונים</button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentPage === 'yearly') {
+                html = `
+                    <div class="card">
+                        <h1>SalaryMate</h1>
+                        <h3>חישוב חכם יותר של המשכורת שלך</h3>
+                        <h4>שלום ${userName}</h4>
+                        <div class="theme-toggle">
+                            <i class="fas fa-moon icon" onclick="toggleTheme()"></i>
+                            <select onchange="setPalette(this.value)">
+                                <option value="pink" ${localStorage.getItem('palette') === 'pink' ? 'selected' : ''}>ורוד</option>
+                                <option value="red" ${localStorage.getItem('palette') === 'red' ? 'selected' : ''}>אדום</option>
+                                <option value="yellow" ${localStorage.getItem('palette') === 'yellow' ? 'selected' : ''}>צהוב</option>
+                                <option value="black-white" ${localStorage.getItem('palette') === 'black-white' ? 'selected' : ''}>שחור-לבן</option>
+                                <option value="gray" ${localStorage.getItem('palette') === 'gray' ? 'selected' : ''}>אפור</option>
+                                <option value="blue" ${localStorage.getItem('palette') === 'blue' ? 'selected' : ''}>כחול</option>
+                                <option value="cyan" ${localStorage.getItem('palette') === 'cyan' ? 'selected' : ''}>תכלת</option>
+                                <option value="green" ${localStorage.getItem('palette') === 'green' ? 'selected' : ''}>ירוק</option>
+                                <option value="orange" ${localStorage.getItem('palette') === 'orange' ? 'selected' : ''}>כתום</option>
+                            </select>
+                        </div>
+                        <input type="number" id="yearSelectYearly" value="${selectedYear}" min="1948" max="2500" onchange="renderYearly()">
+                        <div id="yearlyResult"></div>
+                        <div class="card" id="yearlyTotal"></div>
+                        <div class="button-group">
+                            <button onclick="navigate('home')">חזור</button>
+                            <button onclick="navigate('monthly')">חישוב חודשי כללי</button>
+                            <button onclick="navigate('schedule')">לוח חודשי</button>
+                            <button onclick="deleteYearlyData()">מחק נתונים</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            app.innerHTML = html;
+            if (currentPage === 'schedule') updateCalendar();
+            if (currentPage === 'yearly') renderYearly();
+        }
+
+        function saveName() {
+            userName = document.getElementById('nameInput').value;
+            localStorage.setItem('userName', userName);
+            navigate('home');
+        }
+
+        function calculateMonthly() {
+            hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            totalHours = parseFloat(document.getElementById('totalHours').value) || 0;
+            const result = calculateSalary(hourlyRate, totalHours);
+            document.getElementById('result').innerHTML = `
+                <p>שכר ברוטו: ${result.gross.toFixed(2)} ₪</p>
+                <p>מס הכנסה: ${result.tax.toFixed(2)} ₪</p>
+                <p>ביטוח לאומי: ${result.ni.toFixed(2)} ₪</p>
+                <p>הפרשה לפנסיה: ${result.pension.toFixed(2)} ₪</p>
+                <p>שכר נטו: ${result.net.toFixed(2)} ₪</p>
+            `;
+        }
+
+        function updateCalendar() {
+            selectedMonth = parseInt(document.getElementById('monthSelect').value);
+            selectedYear = parseInt(document.getElementById('yearSelect').value);
+            const calendar = document.getElementById('calendar');
+            const firstDay = new Date(selectedYear, selectedMonth, 1).getDay();
+            const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+            let html = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'].map(day => `<div>${day}</div>`).join('');
+            for (let i = 0; i < firstDay; i++) html += '<div></div>';
+            for (let day = 1; day <= daysInMonth; day++) {
+                html += `<div onclick="openModal(${day})">${day}</div>`;
+            }
+            calendar.innerHTML = html;
+            calculateMonthlySchedule();
+        }
+
+        function openModal(day) {
+            selectedDay = day;
+            const modal = document.getElementById('dayModal');
+            const existingData = dataStore[selectedYear]?.[selectedMonth]?.[selectedDay] || {};
+            document.getElementById('startShiftTime').value = existingData.startShiftTime || '';
+            document.getElementById('endShiftTime').value = existingData.endShiftTime || '';
+            document.getElementById('shiftHours').value = existingData.shiftHours || 0;
+            document.getElementById('bonusHours').value = existingData.bonusHours || 0;
+            document.getElementById('bonusPercent').value = existingData.bonusPercent || 0;
+            hourlyRate = parseFloat(document.getElementById('hourlyRateSchedule').value) || 0;
+            const regularHours = Math.max(0, (existingData.shiftHours || 0) - (existingData.bonusHours || 0));
+            const bonusAmount = (existingData.bonusHours || 0) * hourlyRate * ((existingData.bonusPercent || 0) / 100);
+            const gross = (regularHours * hourlyRate) + bonusAmount;
+            document.getElementById('dailyGross').innerText = `שכר ברוטו יומי: ${gross.toFixed(2)} ₪`;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('dayModal').style.display = 'none';
+        }
+
+        function saveDayData() {
+            const startShiftTime = document.getElementById('startShiftTime').value;
+            const endShiftTime = document.getElementById('endShiftTime').value;
+            const shiftHours = parseFloat(document.getElementById('shiftHours').value) || 0;
+            const bonusHours = parseFloat(document.getElementById('bonusHours').value) || 0;
+            const bonusPercent = parseFloat(document.getElementById('bonusPercent').value) || 0;
+            hourlyRate = parseFloat(document.getElementById('hourlyRateSchedule').value) || 0;
+
+            if (!dataStore[selectedYear]) dataStore[selectedYear] = {};
+            if (!dataStore[selectedYear][selectedMonth]) dataStore[selectedYear][selectedMonth] = {};
+            const regularHours = Math.max(0, shiftHours - bonusHours);
+            const gross = (regularHours * hourlyRate) + (bonusHours * hourlyRate * (bonusPercent / 100));
+            dataStore[selectedYear][selectedMonth][selectedDay] = {
+                startShiftTime,
+                endShiftTime,
+                shiftHours,
+                bonusHours,
+                bonusPercent,
+                gross: gross.toFixed(2) // שמירת ה-gross היומי
+            };
+
+            console.log("Saving data:", dataStore); // לוג לשמירת נתונים
+            localStorage.setItem('dataStore', JSON.stringify(dataStore));
+            closeModal();
+            updateCalendar();
+            calculateMonthlySchedule();
+        }
+
+        function calculateMonthlySchedule() {
+            hourlyRate = parseFloat(document.getElementById('hourlyRateSchedule').value) || 0;
+            let totalGross = 0;
+
+            if (dataStore[selectedYear] && dataStore[selectedYear][selectedMonth]) {
+                Object.values(dataStore[selectedYear][selectedMonth]).forEach(data => {
+                    totalGross += parseFloat(data.gross) || 0;
+                });
+            }
+            console.log("Monthly Total Gross:", totalGross); // לוג לבדיקה
+            let tax = calculateTax(totalGross);
+            let ni = calculateNationalInsurance(totalGross);
+            let pension = totalGross * pensionRate;
+            let net = totalGross - tax - ni - pension;
+
+            document.getElementById('monthlyResult').innerHTML = `
+                <p>שכר ברוטו: ${totalGross.toFixed(2) || '0.00'} ₪</p>
+                <p>מס הכנסה: ${tax.toFixed(2) || '0.00'} ₪</p>
+                <p>ביטוח לאומי: ${ni.toFixed(2) || '0.00'} ₪</p>
+                <p>הפרשה לפנסיה: ${pension.toFixed(2) || '0.00'} ₪</p>
+                <p>שכר נטו: ${net.toFixed(2) || '0.00'} ₪</p>
+            `;
+        }
+
+        function renderYearly() {
+            selectedYear = parseInt(document.getElementById('yearSelectYearly').value);
+            let html = '';
+            let totalGross = 0, totalTax = 0, totalNi = 0, totalPension = 0, totalNet = 0;
+            for (let month = 0; month < 12; month++) {
+                let gross = 0, tax = 0, ni = 0, pension = 0, net = 0;
+                if (dataStore[selectedYear] && dataStore[selectedYear][month]) {
+                    let monthGross = 0;
+                    Object.values(dataStore[selectedYear][month]).forEach(data => {
+                        monthGross += parseFloat(data.gross) || 0;
+                    });
+                    tax = calculateTax(monthGross);
+                    ni = calculateNationalInsurance(monthGross);
+                    pension = monthGross * pensionRate;
+                    net = monthGross - tax - ni - pension;
+                    gross = monthGross;
+                }
+                html += `
+                    <div class="card">
+                        <h4>${new Date(0, month).toLocaleString('he', { month: 'long' })}</h4>
+                        <p>שכר ברוטו: <input type="number" value="${gross.toFixed(2)}" onchange="editMonthGross(${month}, this.value)"></p>
+                        <p>מס הכנסה: ${tax.toFixed(2)} ₪</p>
+                        <p>ביטוח לאומי: ${ni.toFixed(2)} ₪</p>
+                        <p>הפרשה לפנסיה: ${pension.toFixed(2)} ₪</p>
+                        <p>שכר נטו: ${net.toFixed(2)} ₪</p>
+                    </div>
+                `;
+                totalGross += gross;
+                totalTax += tax;
+                totalNi += ni;
+                totalPension += pension;
+                totalNet += net;
+            }
+            document.getElementById('yearlyResult').innerHTML = html;
+            document.getElementById('yearlyTotal').innerHTML = `
+                <h3>סיכום כולל לשנת ${selectedYear}</h3>
+                <p>שכר ברוטו כולל: ${totalGross.toFixed(2)} ₪</p>
+                <p>מס הכנסה כולל: ${totalTax.toFixed(2)} ₪</p>
+                <p>ביטוח לאומי כולל: ${totalNi.toFixed(2)} ₪</p>
+                <p>הפרשה לפנסיה כולל: ${totalPension.toFixed(2)} ₪</p>
+                <p>שכר נטו כולל: ${totalNet.toFixed(2)} ₪</p>
+            `;
+        }
+
+        function editMonthGross(month, newGross) {
+            if (!dataStore[selectedYear]) dataStore[selectedYear] = {};
+            if (!dataStore[selectedYear][month]) dataStore[selectedYear][month] = {};
+            dataStore[selectedYear][month].gross = parseFloat(newGross) || 0;
+            localStorage.setItem('dataStore', JSON.stringify(dataStore));
+            renderYearly();
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme') || 'light';
+            setTheme(currentTheme === 'light' ? 'dark' : 'light');
+        }
+
+        // Initialize
+        renderPage();
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const savedPalette = localStorage.getItem('palette') || 'orange';
+            setTheme(savedTheme);
+            setPalette(savedPalette);
+        });
+    </script>
+</body>
+</html>
