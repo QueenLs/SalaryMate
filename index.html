@@ -91,7 +91,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 50%; /* צמצום כדי למנוע גלישה */
+            max-width: 50%;
         }
 
         [data-theme="dark"] .header {
@@ -287,12 +287,19 @@
 
             .header {
                 padding: 5px 10px;
-                height: 40px; /* הקטנת גובה ה-header במובייל */
+                height: 40px;
+                flex-wrap: nowrap; /* מניעת גלישה */
             }
 
             .header h1 {
-                font-size: 16px;
-                max-width: 60%; /* התאמה למובייל */
+                font-size: 14px; /* הקטנת גופן במובייל */
+                max-width: 60%;
+                margin: 0 auto; /* מרכוז הלוגו */
+                text-align: center;
+            }
+
+            .header .icon {
+                font-size: 18px; /* הקטנת אייקונים במובייל */
             }
 
             .sidebar {
@@ -307,9 +314,9 @@
             input, select {
                 font-size: 12px;
                 padding: 8px;
-                max-width: 200px; /* הקטנת שדות במובייל */
+                max-width: 200px;
                 display: block;
-                margin: 5px auto; /* מרכוז שדות עם רווח קטן */
+                margin: 5px auto;
             }
 
             button {
@@ -319,9 +326,9 @@
             }
 
             .calendar {
-                grid-template-columns: repeat(7, minmax(30px, 1fr)); /* תאים קטנים יותר במובייל */
+                grid-template-columns: repeat(7, minmax(30px, 1fr));
                 gap: 1px;
-                max-width: 320px; /* הקטנת לוח במובייל */
+                max-width: 320px;
             }
 
             .calendar div {
@@ -333,13 +340,13 @@
                 padding: 10px;
                 margin: 10px 0;
                 border-radius: 8px;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* צל עדין יותר */
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             }
 
             .theme-toggle {
                 gap: 5px;
                 margin: 10px auto;
-                flex-direction: column; /* ערימה אנכית במובייל */
+                flex-direction: column;
             }
 
             .theme-toggle .fas.fa-moon {
@@ -375,7 +382,7 @@
             padding: 15px;
             border-radius: 10px;
             width: 90%;
-            max-width: 300px; /* הקטנה במובייל */
+            max-width: 300px;
             box-shadow: var(--shadow);
         }
     </style>
