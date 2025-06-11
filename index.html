@@ -247,21 +247,22 @@
 
         .calendar {
             display: grid;
-            grid-template-columns: repeat(7, minmax(30px, 1fr)); /* התאמה גמישה למובייל */
-            gap: 5px; /* מרווחים קטנים יותר */
+            grid-template-columns: repeat(7, minmax(20px, 1fr)); /* רוחב מינימלי נמוך יותר */
+            gap: 2px; /* מרווחים קטנים */
             margin: 20px 0;
             max-width: 100%; /* הגבלת רוחב */
             overflow-x: hidden; /* מניעת גלילה אופקית */
         }
 
         .calendar div {
-            padding: 10px; /* padding סביר */
+            padding: 8px; /* הקטנת padding */
             background: var(--accent-color);
             cursor: pointer;
-            border-radius: 8px;
-            font-size: 14px; /* גופן קריא */
+            border-radius: 4px; /* רדיוס פינה קטן יותר */
+            font-size: 12px; /* גופן קטן יותר */
             text-align: center;
             min-width: 0; /* מניעת הרחבה מיותרת */
+            box-sizing: border-box; /* כולל padding ברוחב */
             white-space: nowrap; /* מניעת שבירת שורות */
             overflow: hidden; /* הסתרת טקסט עודף */
             text-overflow: ellipsis; /* קיצור טקסט עם ... אם חתוך */
@@ -274,34 +275,35 @@
 
         @media (max-width: 600px) {
             .container {
-                padding: 15px; /* הקטנת padding למובייל */
+                padding: 10px; /* הקטנת padding למובייל */
             }
 
             .header {
-                padding: 10px 15px;
+                padding: 5px 10px;
             }
 
             .sidebar {
-                width: 200px; /* הקטנת רוחב התפריט במובייל */
-                padding: 15px;
+                width: 180px; /* הקטנת רוחב התפריט */
+                padding: 10px;
             }
 
-            h1 { font-size: 24px; }
-            h3 { font-size: 18px; }
-            h4 { font-size: 16px; }
+            h1 { font-size: 20px; }
+            h3 { font-size: 16px; }
+            h4 { font-size: 14px; }
 
             input, button {
-                font-size: 14px;
+                font-size: 12px;
+                padding: 10px;
             }
 
             .calendar {
-                grid-template-columns: repeat(7, minmax(25px, 1fr)); /* התאמה למובייל */
-                gap: 3px; /* מרווחים קטנים יותר */
+                grid-template-columns: repeat(7, minmax(20px, 1fr)); /* שמירה על 7 עמודות עם רוחב מינימלי */
+                gap: 1px; /* מרווח מינימלי */
             }
 
             .calendar div {
-                padding: 6px; /* הקטנת padding */
-                font-size: 12px; /* הקטנת גופן */
+                padding: 4px; /* הקטנת padding למובייל */
+                font-size: 10px; /* גופן קטן יותר במובייל */
             }
         }
 
@@ -320,19 +322,19 @@
 
         .modal-content {
             background: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
+            padding: 15px;
+            border-radius: 10px;
             width: 90%;
-            max-width: 400px; /* הקטנה במובייל */
+            max-width: 350px; /* הקטנה נוספת במובייל */
             box-shadow: var(--shadow);
         }
 
         .button-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
-            margin-top: 15px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -358,17 +360,17 @@
     <div class="modal" id="dayModal">
         <div class="modal-content">
             <h3>הזנת שעות עבודה</h3>
-            <p style="font-size: 14px; color: var(--text-color);">שעת התחלת משמרת: הזן את שעת התחלת העבודה</p>
+            <p style="font-size: 12px; color: var(--text-color);">שעת התחלת משמרת: הזן את שעת התחלת העבודה</p>
             <input type="time" id="startShiftTime" placeholder="שעת התחלה">
-            <p style="font-size: 14px; color: var(--text-color);">שעת סיום משמרת: הזן את שעת סיום העבודה</p>
+            <p style="font-size: 12px; color: var(--text-color);">שעת סיום משמרת: הזן את שעת סיום העבודה</p>
             <input type="time" id="endShiftTime" placeholder="שעת סיום">
-            <p style="font-size: 14px; color: var(--text-color);">שעות משמרת: הזן את מספר השעות בעבודה</p>
+            <p style="font-size: 12px; color: var(--text-color);">שעות משמרת: הזן את מספר השעות בעבודה</p>
             <input type="number" id="shiftHours" placeholder="שעות משמרת" step="0.5">
-            <p style="font-size: 14px; color: var(--text-color);">שעות עם בונוס: הזן שעות עם תוספת תשלום</p>
+            <p style="font-size: 12px; color: var(--text-color);">שעות עם בונוס: הזן שעות עם תוספת תשלום</p>
             <input type="number" id="bonusHours" placeholder="שעות עם בונוס" step="0.5">
-            <p style="font-size: 14px; color: var(--text-color);">אחוז בונוס: הזן את אחוז התוספת לשעות הבונוס</p>
+            <p style="font-size: 12px; color: var(--text-color);">אחוז בונוס: הזן את אחוז התוספת לשעות הבונוס</p>
             <input type="number" id="bonusPercent" placeholder="אחוז בונוס (%)">
-            <p id="dailyGross" style="font-size: 14px; color: var(--primary-color);"></p>
+            <p id="dailyGross" style="font-size: 12px; color: var(--primary-color);"></p>
             <button onclick="saveDayData()">שמור</button>
             <button onclick="closeModal()">סגור</button>
         </div>
