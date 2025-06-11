@@ -7,6 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="icon.ico">
+
     <style>
         * {
             margin: 0;
@@ -35,10 +36,10 @@
 
         /* Dark Theme with Palette-Specific Backgrounds */
         [data-theme="dark"] {
-            --text-color: #333333; /* שחור עדין */
+            --text-color: #333333;
             --card-bg: rgba(255, 255, 255, 0.2);
             --accent-color: #ffffff;
-            --shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
         [data-theme="dark"][data-palette="pink"] { --bg-color: #c71585; --secondary-color: #c71585; }
         [data-theme="dark"][data-palette="red"] { --bg-color: #8b0000; --secondary-color: #8b0000; }
@@ -63,7 +64,7 @@
 
         .container {
             max-width: 100%;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
             min-height: 100vh;
             display: flex;
@@ -75,7 +76,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
+            padding: 10px 15px;
             background: var(--secondary-color);
             color: var(--accent-color);
             position: fixed;
@@ -87,7 +88,7 @@
         }
 
         .header h1 {
-            font-size: 20px;
+            font-size: 18px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -95,12 +96,12 @@
         }
 
         [data-theme="dark"] .header {
-            background: rgba(0, 0, 0, 0.8); /* רקע כהה עם שקיפות */
-            color: #333333; /* טקסט שחור עדין */
+            background: rgba(0, 0, 0, 0.8);
+            color: #333333;
         }
 
         .icon {
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
             color: var(--accent-color);
             transition: color 0.3s ease;
@@ -111,14 +112,13 @@
         }
 
         .theme-toggle .fas.fa-moon {
-            font-size: 24px;
-            cursor: pointer;
-            padding: 5px;
-            border: 2px solid var(--primary-color);
+            font-size: 18px;
+            padding: 3px;
+            border: 1px solid var(--primary-color);
             border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             background: var(--accent-color);
             color: var(--primary-color);
+            margin-right: 5px;
         }
 
         .theme-toggle .fas.fa-moon:hover {
@@ -127,15 +127,14 @@
         }
 
         .theme-toggle select {
-            padding: 5px 10px;
-            border: 2px solid var(--primary-color);
-            border-radius: 10px;
+            padding: 5px 8px;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
             background: var(--accent-color);
             color: var(--text-color);
             cursor: pointer;
-            box-shadow: var(--shadow);
-            font-size: 16px;
-            max-width: 120px; /* קיצור השדה */
+            font-size: 14px;
+            max-width: 100px;
         }
 
         .theme-toggle select:hover {
@@ -146,12 +145,12 @@
         .sidebar {
             position: fixed;
             top: 0;
-            right: -300px;
-            width: 300px;
+            right: -250px;
+            width: 250px;
             height: 100%;
             background: var(--card-bg);
             transition: right 0.3s ease;
-            padding: 30px;
+            padding: 15px;
             z-index: 1100;
             box-shadow: var(--shadow);
         }
@@ -162,12 +161,12 @@
 
         .sidebar a {
             display: block;
-            padding: 15px;
+            padding: 10px;
             color: var(--text-color);
             text-decoration: none;
-            margin: 15px 0;
-            font-size: 20px;
-            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 16px;
+            border-radius: 6px;
             transition: background 0.3s ease;
         }
 
@@ -178,7 +177,7 @@
 
         .sidebar .close-sidebar {
             text-align: center;
-            padding: 10px;
+            padding: 8px;
             color: var(--text-color);
             cursor: pointer;
         }
@@ -191,48 +190,52 @@
         .theme-toggle {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin: 20px 0;
+            gap: 5px;
+            margin: 15px auto;
             justify-content: center;
-            position: relative;
+            max-width: 200px;
         }
 
         .card {
             background: var(--card-bg);
-            padding: 30px;
-            margin: 20px 0;
-            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
             box-shadow: var(--shadow);
         }
 
         h1, h2, h3, h4 {
             color: var(--text-color);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
         }
 
-        h1 { font-size: 36px; font-weight: 700; }
-        h3 { font-size: 24px; font-weight: 500; }
-        h4 { font-size: 20px; font-weight: 400; }
+        h1 { font-size: 28px; font-weight: 700; }
+        h3 { font-size: 20px; font-weight: 500; }
+        h4 { font-size: 16px; font-weight: 400; }
 
         input, select {
-            padding: 15px;
-            margin: 10px 0;
+            padding: 10px;
+            margin: 8px 0;
             width: 100%;
-            border: 2px solid var(--primary-color);
-            border-radius: 10px;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
             background: var(--accent-color);
             color: var(--text-color);
             font-size: 14px;
             text-align: center;
             box-shadow: var(--shadow);
+            margin: 0;
         }
 
         button {
-            padding: 15px 30px;
-            margin: 10px 5px;
+            padding: 10px 20px;
+            margin: 8px 5px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             background: var(--primary-color);
             color: var(--accent-color);
             cursor: pointer;
@@ -247,25 +250,30 @@
 
         .calendar {
             display: grid;
-            grid-template-columns: repeat(7, minmax(20px, 1fr)); /* רוחב מינימלי נמוך יותר */
-            gap: 2px; /* מרווחים קטנים */
-            margin: 20px 0;
-            max-width: 100%; /* הגבלת רוחב */
-            overflow-x: hidden; /* מניעת גלילה אופקית */
+            grid-template-columns: repeat(7, minmax(35px, 1fr));
+            gap: 2px;
+            margin: 15px auto;
+            max-width: 450px;
+            overflow-x: hidden;
         }
 
         .calendar div {
-            padding: 8px; /* הקטנת padding */
+            padding: 8px;
             background: var(--accent-color);
             cursor: pointer;
-            border-radius: 4px; /* רדיוס פינה קטן יותר */
-            font-size: 12px; /* גופן קטן יותר */
+            border-radius: 4px;
+            font-size: 14px;
             text-align: center;
-            min-width: 0; /* מניעת הרחבה מיותרת */
-            box-sizing: border-box; /* כולל padding ברוחב */
-            white-space: nowrap; /* מניעת שבירת שורות */
-            overflow: hidden; /* הסתרת טקסט עודף */
-            text-overflow: ellipsis; /* קיצור טקסט עם ... אם חתוך */
+            min-width: 0;
+            box-sizing: border-box;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .calendar div.has-data {
+            background: var(--primary-color);
+            color: var(--accent-color);
         }
 
         .calendar div:hover {
@@ -275,7 +283,7 @@
 
         @media (max-width: 600px) {
             .container {
-                padding: 10px; /* הקטנת padding למובייל */
+                padding: 10px;
             }
 
             .header {
@@ -283,7 +291,7 @@
             }
 
             .sidebar {
-                width: 180px; /* הקטנת רוחב התפריט */
+                width: 180px;
                 padding: 10px;
             }
 
@@ -291,19 +299,47 @@
             h3 { font-size: 16px; }
             h4 { font-size: 14px; }
 
-            input, button {
+            input, select {
                 font-size: 12px;
-                padding: 10px;
+                padding: 8px;
+                max-width: 250px;
+            }
+
+            button {
+                font-size: 12px;
+                padding: 8px 15px;
             }
 
             .calendar {
-                grid-template-columns: repeat(7, minmax(20px, 1fr)); /* שמירה על 7 עמודות עם רוחב מינימלי */
-                gap: 1px; /* מרווח מינימלי */
+                grid-template-columns: repeat(7, minmax(35px, 1fr));
+                gap: 1px;
+                max-width: 400px;
             }
 
             .calendar div {
-                padding: 4px; /* הקטנת padding למובייל */
-                font-size: 10px; /* גופן קטן יותר במובייל */
+                padding: 6px;
+                font-size: 12px;
+            }
+
+            .card {
+                padding: 15px;
+                margin: 10px 0;
+                border-radius: 8px;
+            }
+
+            .theme-toggle {
+                gap: 5px;
+                margin: 10px auto;
+            }
+
+            .theme-toggle .fas.fa-moon {
+                font-size: 16px;
+                padding: 2px;
+            }
+
+            .theme-toggle select {
+                padding: 4px 6px;
+                font-size: 12px;
             }
         }
 
@@ -325,7 +361,7 @@
             padding: 15px;
             border-radius: 10px;
             width: 90%;
-            max-width: 350px; /* הקטנה נוספת במובייל */
+            max-width: 350px;
             box-shadow: var(--shadow);
         }
 
@@ -386,7 +422,7 @@
         let selectedYear = new Date().getFullYear();
         const dataStore = JSON.parse(localStorage.getItem('dataStore')) || {};
 
-        console.log("Initial dataStore:", dataStore); // לוג לטעינת נתונים
+        console.log("Initial dataStore:", dataStore);
 
         // הגדרת מדרגות מס הכנסה (2025, חודשי)
         const taxBrackets = [
@@ -401,8 +437,8 @@
 
         // הגדרת ביטוח לאומי (2025, חודשי)
         const niRates = [
-            { threshold: 7522, rate: 0.0125 }, // 1.25% על ההכנסה הראשונה
-            { threshold: 50695, rate: 0.07 }    // 7% על ההכנסה שבין 7,522 ל-50,695
+            { threshold: 7522, rate: 0.0125 },
+            { threshold: 50695, rate: 0.07 }
         ];
 
         // הגדרת פנסיה (6% מהברוטו)
@@ -432,7 +468,6 @@
             if (dropdown) {
                 dropdown.classList.toggle('active');
             }
-            // סגירה בעת לחיצה מחוץ לתפריט
             document.addEventListener('click', function closeDropdown(event) {
                 if (!dropdown.contains(event.target) && !event.target.closest('.theme-toggle')) {
                     dropdown.classList.remove('active');
@@ -579,11 +614,11 @@
                             </select>
                         </div>
                         <input type="number" id="hourlyRateSchedule" placeholder="שכר שעתי (₪)" step="0.5">
-                        <div style="display: flex; gap: 10px; justify-content: center;">
-                            <select id="monthSelect" onchange="updateCalendar()" style="flex: 1; border-radius: 20px;">
+                        <div style="display: flex; justify-content: center; gap: 2px; margin: 10px 0; padding: 0;">
+                            <select id="monthSelect" onchange="updateCalendar()" style="flex: 0 0 auto; max-width: 180px; border-radius: 8px; margin: 0;">
                                 ${[...Array(12).keys()].map(i => `<option value="${i}" ${i === selectedMonth ? 'selected' : ''}>${new Date(0, i).toLocaleString('he', { month: 'long' })}</option>`).join('')}
                             </select>
-                            <input type="number" id="yearSelect" value="${selectedYear}" min="1948" max="2500" onchange="updateCalendar()" style="flex: 1; border-radius: 20px;">
+                            <input type="number" id="yearSelect" value="${selectedYear}" min="1948" max="2500" onchange="updateCalendar()" style="flex: 0 0 auto; max-width: 120px; border-radius: 8px; margin: 0;">
                         </div>
                         <div class="calendar" id="calendar"></div>
                         <div id="monthlyResult"></div>
@@ -657,10 +692,11 @@
             const calendar = document.getElementById('calendar');
             const firstDay = new Date(selectedYear, selectedMonth, 1).getDay();
             const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
-            let html = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'].map(day => `<div>${day}</div>`).join(''); // ודא ש"שבת" כלול
+            let html = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'].map(day => `<div>${day}</div>`).join('');
             for (let i = 0; i < firstDay; i++) html += '<div></div>';
             for (let day = 1; day <= daysInMonth; day++) {
-                html += `<div onclick="openModal(${day})">${day}</div>`;
+                const hasData = dataStore[selectedYear]?.[selectedMonth]?.[day];
+                html += `<div onclick="openModal(${day})" class="${hasData ? 'has-data' : ''}">${day}</div>`;
             }
             calendar.innerHTML = html;
             calculateMonthlySchedule();
@@ -672,11 +708,25 @@
             const existingData = dataStore[selectedYear]?.[selectedMonth]?.[selectedDay] || {};
             document.getElementById('startShiftTime').value = existingData.startShiftTime || '';
             document.getElementById('endShiftTime').value = existingData.endShiftTime || '';
-            document.getElementById('shiftHours').value = existingData.shiftHours || 0;
+            
+            // חישוב אוטומטי של שעות אם שעות התחלה וסיום מוזנות
+            const startTime = document.getElementById('startShiftTime').value;
+            const endTime = document.getElementById('endShiftTime').value;
+            let shiftHours = parseFloat(document.getElementById('shiftHours').value) || 0;
+            if (startTime && endTime) {
+                const start = new Date(`2000-01-01 ${startTime}`);
+                const end = new Date(`2000-01-01 ${endTime}`);
+                const diffMs = end - start;
+                const diffHours = diffMs / (1000 * 60 * 60);
+                shiftHours = Math.max(0, diffHours);
+                document.getElementById('shiftHours').value = shiftHours.toFixed(2);
+            }
+
+            document.getElementById('shiftHours').value = existingData.shiftHours || shiftHours.toFixed(2);
             document.getElementById('bonusHours').value = existingData.bonusHours || 0;
             document.getElementById('bonusPercent').value = existingData.bonusPercent || 0;
             hourlyRate = parseFloat(document.getElementById('hourlyRateSchedule').value) || 0;
-            const regularHours = Math.max(0, (existingData.shiftHours || 0) - (existingData.bonusHours || 0));
+            const regularHours = Math.max(0, (shiftHours - (existingData.bonusHours || 0)));
             const bonusAmount = (existingData.bonusHours || 0) * hourlyRate * ((existingData.bonusPercent || 0) / 100);
             const gross = (regularHours * hourlyRate) + bonusAmount;
             document.getElementById('dailyGross').innerText = `שכר ברוטו יומי: ${gross.toFixed(2)} ₪`;
@@ -690,10 +740,19 @@
         function saveDayData() {
             const startShiftTime = document.getElementById('startShiftTime').value;
             const endShiftTime = document.getElementById('endShiftTime').value;
-            const shiftHours = parseFloat(document.getElementById('shiftHours').value) || 0;
+            let shiftHours = parseFloat(document.getElementById('shiftHours').value) || 0;
             const bonusHours = parseFloat(document.getElementById('bonusHours').value) || 0;
             const bonusPercent = parseFloat(document.getElementById('bonusPercent').value) || 0;
             hourlyRate = parseFloat(document.getElementById('hourlyRateSchedule').value) || 0;
+
+            // חישוב שעות אם שעות התחלה וסיום מוזנות
+            if (startShiftTime && endShiftTime) {
+                const start = new Date(`2000-01-01 ${startShiftTime}`);
+                const end = new Date(`2000-01-01 ${endShiftTime}`);
+                const diffMs = end - start;
+                const diffHours = diffMs / (1000 * 60 * 60);
+                shiftHours = Math.max(0, diffHours);
+            }
 
             if (!dataStore[selectedYear]) dataStore[selectedYear] = {};
             if (!dataStore[selectedYear][selectedMonth]) dataStore[selectedYear][selectedMonth] = {};
@@ -702,13 +761,13 @@
             dataStore[selectedYear][selectedMonth][selectedDay] = {
                 startShiftTime,
                 endShiftTime,
-                shiftHours,
+                shiftHours: shiftHours.toFixed(2),
                 bonusHours,
                 bonusPercent,
-                gross: gross.toFixed(2) // שמירת ה-gross היומי
+                gross: gross.toFixed(2)
             };
 
-            console.log("Saving data:", dataStore); // לוג לשמירת נתונים
+            console.log("Saving data:", dataStore);
             localStorage.setItem('dataStore', JSON.stringify(dataStore));
             closeModal();
             updateCalendar();
@@ -724,7 +783,7 @@
                     totalGross += parseFloat(data.gross) || 0;
                 });
             }
-            console.log("Monthly Total Gross:", totalGross); // לוג לבדיקה
+            console.log("Monthly Total Gross:", totalGross);
             let tax = calculateTax(totalGross);
             let ni = calculateNationalInsurance(totalGross);
             let pension = totalGross * pensionRate;
