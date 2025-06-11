@@ -7,7 +7,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="icon.ico">
-
     <style>
         * {
             margin: 0;
@@ -39,7 +38,7 @@
             --text-color: #333333;
             --card-bg: rgba(255, 255, 255, 0.2);
             --accent-color: #ffffff;
-            --shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* צל עדין יותר במובייל */
         }
         [data-theme="dark"][data-palette="pink"] { --bg-color: #c71585; --secondary-color: #c71585; }
         [data-theme="dark"][data-palette="red"] { --bg-color: #8b0000; --secondary-color: #8b0000; }
@@ -92,7 +91,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 60%;
+            max-width: 50%; /* צמצום כדי למנוע גלישה */
         }
 
         [data-theme="dark"] .header {
@@ -288,6 +287,12 @@
 
             .header {
                 padding: 5px 10px;
+                height: 40px; /* הקטנת גובה ה-header במובייל */
+            }
+
+            .header h1 {
+                font-size: 16px;
+                max-width: 60%; /* התאמה למובייל */
             }
 
             .sidebar {
@@ -302,34 +307,39 @@
             input, select {
                 font-size: 12px;
                 padding: 8px;
-                max-width: 250px;
+                max-width: 200px; /* הקטנת שדות במובייל */
+                display: block;
+                margin: 5px auto; /* מרכוז שדות עם רווח קטן */
             }
 
             button {
                 font-size: 12px;
                 padding: 8px 15px;
+                margin: 5px;
             }
 
             .calendar {
-                grid-template-columns: repeat(7, minmax(35px, 1fr));
+                grid-template-columns: repeat(7, minmax(30px, 1fr)); /* תאים קטנים יותר במובייל */
                 gap: 1px;
-                max-width: 400px;
+                max-width: 320px; /* הקטנת לוח במובייל */
             }
 
             .calendar div {
-                padding: 6px;
-                font-size: 12px;
+                padding: 4px;
+                font-size: 10px;
             }
 
             .card {
-                padding: 15px;
+                padding: 10px;
                 margin: 10px 0;
                 border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* צל עדין יותר */
             }
 
             .theme-toggle {
                 gap: 5px;
                 margin: 10px auto;
+                flex-direction: column; /* ערימה אנכית במובייל */
             }
 
             .theme-toggle .fas.fa-moon {
@@ -340,6 +350,10 @@
             .theme-toggle select {
                 padding: 4px 6px;
                 font-size: 12px;
+            }
+
+            .button-group {
+                gap: 5px;
             }
         }
 
@@ -361,16 +375,8 @@
             padding: 15px;
             border-radius: 10px;
             width: 90%;
-            max-width: 350px;
+            max-width: 300px; /* הקטנה במובייל */
             box-shadow: var(--shadow);
-        }
-
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 10px;
         }
     </style>
 </head>
